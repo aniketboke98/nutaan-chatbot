@@ -1,0 +1,49 @@
+{% liquid
+  assign final_auth = block.settings.authorization
+  assign final_api_key = block.settings.api_key
+
+  if block.settings.full_script != blank
+    assign script_parts = block.settings.full_script | split: 'Authorization="'
+    if script_parts.size > 1
+      assign auth_part = script_parts[1] | split: '"'
+      assign final_auth = auth_part[0]
+    endif
+
+    assign api_parts = block.settings.full_script | split: 'x-api-key="'
+    if api_parts.size > 1
+      assign key_part = api_parts[1] | split: '"'
+      assign final_api_key = key_part[0]
+    endif
+  endif
+%}
+
+{% if final_auth != blank and final_api_key != blank %}
+  <script src="https://cdn.nutaan.com/chatbot-widget.js" Authorization="{{ final_auth }}" x-api-key="{{ final_api_key }}" defer></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Nutaan Live Chat",
+  "target": "body",
+  "settings": [
+    {
+      "type": "text",
+      "id": "authorization",
+      "label": "Authorization Token",
+      "info": "Paste your Bearer token here (e.g. Bearer nutaan-...)"
+    },
+    {
+      "type": "text",
+      "id": "api_key",
+      "label": "API Key",
+      "info": "Paste your API key here (e.g. nut-...)"
+    },
+    {
+      "type": "textarea",
+      "id": "full_script",
+      "label": "Paste Full Script (Optional)",
+      "info": "If you paste the full <script> tag here, the API key and Authorization token above will be overridden."
+    }
+  ]
+}
+{% endschema %}

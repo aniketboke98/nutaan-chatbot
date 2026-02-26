@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn npm run shopify app generate extension -- --template theme --name nutaan-chatbot-theme
+expect -nocase "App name"
+send "Nutaan Live Chat\r"
+expect eof
