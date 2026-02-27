@@ -2,7 +2,7 @@
 
 client_id = "7d3e3ed750a01e8cf9260ba25bb3eb7f"
 name = "Nutaan Live Chat"
-application_url = "https://example.com"
+application_url = "https://nutaan-live-chat-server.fly.dev"
 embedded = true
 
 [webhooks]
@@ -24,3 +24,6 @@ use_legacy_install_flow = false
 
 [auth]
 redirect_urls = [ ]
+
+[build]
+automatically_update_urls_on_dev = true
