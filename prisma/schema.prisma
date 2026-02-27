@@ -1,20 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Learn more about Prisma schema: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
 
-// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
-// enough when changing adapters.
-// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
+// Shopify session storage — required by @shopify/shopify-app-session-storage-prisma
+// MongoDB uses @id with @map("_id") and @db.ObjectId for auto-generated IDs,
+// but Shopify passes its own string IDs, so we use String @id directly.
 model Session {
-  id                  String    @id
+  id                  String    @id @map("_id")
   shop                String
   state               String
   isOnline            Boolean   @default(false)

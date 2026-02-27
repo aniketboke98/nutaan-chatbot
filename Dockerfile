@@ -7,25 +7,19 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy package files
 COPY package.json package-lock.json* ./
 
-# Install all dependencies (including devDeps needed for build step)
+# Install all deps (devDeps needed for Remix build)
 RUN npm install && npm cache clean --force
 
-# Copy source code
 COPY . .
 
-# Generate Prisma client and build the Remix app
+# Generate Prisma client for MongoDB + build Remix
 RUN npx prisma generate && npm run build
 
-# Remove devDependencies after build to slim the image
+# Prune devDependencies to slim the image
 RUN npm prune --omit=dev
-
-# Remove Shopify CLI (not needed in production)
 RUN npm remove @shopify/cli 2>/dev/null || true
 
-# Start the custom Express server
-# - Binds to 0.0.0.0:PORT immediately
-# - Runs DB migrations after bind (so healthcheck passes right away)
+# Server binds immediately, then syncs MongoDB schema and loads Remix
 CMD ["node", "server.js"]
