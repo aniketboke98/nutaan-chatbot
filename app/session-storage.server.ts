@@ -1,4 +1,4 @@
-import type { Session } from "@shopify/shopify-api";
+import { Session } from "@shopify/shopify-api";
 import prisma from "./db.server";
 
 /**
@@ -100,7 +100,6 @@ function sessionToRecord(session: Session) {
 }
 
 function recordToSession(record: any): Session {
-  const { Session } = require("@shopify/shopify-api");
   const session = new Session({
     id: record.id,
     shop: record.shop,
