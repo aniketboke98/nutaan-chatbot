@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "7d3e3ed750a01e8cf9260ba25bb3eb7f"
+client_id = "5eff3e94fe98591b5986b69a7fa85409"
 name = "Nutaan Live Chat"
-application_url = "https://nutaan-live-chat-server.fly.dev"
+application_url = "https://nutaan-chatbot-production.up.railway.app"
 embedded = true
 
 [webhooks]
