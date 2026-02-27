@@ -24,7 +24,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
   const formData = await request.formData();
-  
+
   const authorization = formData.get("authorization") as string;
   const apiKey = formData.get("apiKey") as string;
 
@@ -33,9 +33,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   try {
-    // Save these credentials globally to the App Installation metafields.
-    // The Theme App Extension block can read these if configured correctly,
-    // or they can be used for backend process if the app receives webhooks etc.
+    // Step 1: Get the real App Installation GID
+    const installationRes = await admin.graphql(
+      `#graphql
+      query GetAppInstallation {
+        currentAppInstallation {
+          id
+        }
+      }`
+    );
+    const installationData = await installationRes.json();
+    const appInstallationId = installationData.data?.currentAppInstallation?.id;
+
+    if (!appInstallationId) {
+      console.error("Could not fetch app installation ID", installationData);
+      return json({ error: "Failed to save configuration." }, { status: 500 });
+    }
+
+    // Step 2: Save metafields using the real installation ID
     const response = await admin.graphql(
       `#graphql
       mutation CreateAppDataMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
@@ -59,24 +74,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
               key: "authorization",
               type: "single_line_text_field",
               value: authorization,
-              ownerId: "gid://shopify/AppInstallation/CURRENT_APP_INSTALLATION_ID"
+              ownerId: appInstallationId,
             },
             {
               namespace: "nutaan_chatbot",
               key: "api_key",
               type: "single_line_text_field",
               value: apiKey,
-              ownerId: "gid://shopify/AppInstallation/CURRENT_APP_INSTALLATION_ID"
-            }
-          ]
-        }
+              ownerId: appInstallationId,
+            },
+          ],
+        },
       }
     );
 
     const result = await response.json();
     if (result.data?.metafieldsSet?.userErrors?.length > 0) {
-       console.error("Metafield saving errors", result.data.metafieldsSet.userErrors);
-       return json({ error: "Failed to save configuration." }, { status: 500 });
+      console.error("Metafield saving errors", result.data.metafieldsSet.userErrors);
+      return json({ error: "Failed to save configuration." }, { status: 500 });
     }
 
     return json({ success: true, message: "Widget configuration saved successfully!" });
