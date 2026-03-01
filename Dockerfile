@@ -18,7 +18,7 @@ COPY . .
 RUN npx prisma generate && npm run build
 
 # Prune devDependencies to slim the image
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev --legacy-peer-deps
 RUN npm remove @shopify/cli 2>/dev/null || true
 
 # Server binds immediately, then syncs MongoDB schema and loads Remix
