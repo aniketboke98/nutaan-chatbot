@@ -8,7 +8,8 @@ module.exports = {
     "prettier",
   ],
   globals: {
-    shopify: "readonly"
+    shopify: "readonly",
+    BigInt: "readonly"
   },
   plugins: ["@shopify/eslint-plugin"],
   rules: {
