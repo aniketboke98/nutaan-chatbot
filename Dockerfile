@@ -10,7 +10,7 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json* ./
 
 # Install all deps (devDeps needed for Remix build)
-RUN npm install --legacy-peer-deps && npm cache clean --force
+RUN npm install --include=dev --legacy-peer-deps && npm cache clean --force
 
 COPY . .
 
