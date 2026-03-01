@@ -14,6 +14,7 @@ const required = [
   "SHOPIFY_APP_URL",
   "DATABASE_URL",
 ];
+
 for (const key of required) {
   if (!process.env[key]) {
     console.warn(`⚠️  WARNING: ${key} is not set.`);
@@ -27,10 +28,12 @@ app.get("/health", (_req, res) => {
 
 // ─── Load Remix build ─────────────────────────────────────────────────────────
 let remixHandler;
+
 try {
   // Build is run as part of Railway's build step (npm run build)
   // so this import should always succeed at runtime.
   const build = await import("./build/server/index.js");
+
   remixHandler = createRequestHandler({ build, mode: process.env.NODE_ENV });
   console.log("✅ Remix app loaded.");
 } catch (err) {
@@ -48,6 +51,7 @@ app.all("*", (req, res, next) => {
       message: "Remix build not loaded. Check build logs.",
     });
   }
+
   return remixHandler(req, res, next);
 });
 

@@ -18,6 +18,7 @@ import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
+
   return null;
 };
 
@@ -47,6 +48,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     if (!appInstallationId) {
       console.error("Could not fetch app installation ID", installationData);
+
       return json({ error: "Failed to save configuration." }, { status: 500 });
     }
 
@@ -89,14 +91,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
 
     const result = await response.json();
+
     if (result.data?.metafieldsSet?.userErrors?.length > 0) {
       console.error("Metafield saving errors", result.data.metafieldsSet.userErrors);
+
       return json({ error: "Failed to save configuration." }, { status: 500 });
     }
 
     return json({ success: true, message: "Widget configuration saved successfully!" });
   } catch (error) {
     console.error("Metafield error:", error);
+
     return json({ error: "Failed to save configuration." }, { status: 500 });
   }
 };
@@ -129,12 +134,14 @@ export default function Index() {
     
     // Look for Authorization="..."
     const authMatch = value.match(/Authorization=["']([^"']+)["']/i);
+
     if (authMatch?.[1]) {
       setAuthorization(authMatch[1]);
     }
 
     // Look for x-api-key="..."
     const apiMatch = value.match(/x-api-key=["']([^"']+)["']/i);
+
     if (apiMatch?.[1]) {
       setApiKey(apiMatch[1]);
     }
