@@ -13,15 +13,18 @@ export class MongoDBSessionStorage {
   async storeSession(session: Session): Promise<boolean> {
     try {
       const { id, ...updateData } = sessionToRecord(session);
+
       await prisma.session.upsert({
         where: { id },
         // ← id intentionally excluded from update (MongoDB _id is immutable)
         update: updateData,
         create: { id, ...updateData },
       });
+
       return true;
     } catch (error) {
       console.error("[Session] storeSession error:", error);
+
       return false;
     }
   }
@@ -29,10 +32,13 @@ export class MongoDBSessionStorage {
   async loadSession(id: string): Promise<Session | undefined> {
     try {
       const record = await prisma.session.findUnique({ where: { id } });
+
       if (!record) return undefined;
+
       return recordToSession(record);
     } catch (error) {
       console.error("[Session] loadSession error:", error);
+
       return undefined;
     }
   }
@@ -40,6 +46,7 @@ export class MongoDBSessionStorage {
   async deleteSession(id: string): Promise<boolean> {
     try {
       await prisma.session.delete({ where: { id } });
+
       return true;
     } catch (error) {
       // If not found, it's already gone — treat as success
@@ -50,9 +57,11 @@ export class MongoDBSessionStorage {
   async deleteSessions(ids: string[]): Promise<boolean> {
     try {
       await prisma.session.deleteMany({ where: { id: { in: ids } } });
+
       return true;
     } catch (error) {
       console.error("[Session] deleteSessions error:", error);
+
       return false;
     }
   }
@@ -60,9 +69,11 @@ export class MongoDBSessionStorage {
   async findSessionsByShop(shop: string): Promise<Session[]> {
     try {
       const records = await prisma.session.findMany({ where: { shop } });
+
       return records.map(recordToSession);
     } catch (error) {
       console.error("[Session] findSessionsByShop error:", error);
+
       return [];
     }
   }
@@ -106,6 +117,7 @@ function recordToSession(record: any): Session {
     state: record.state,
     isOnline: record.isOnline,
   });
+
   if (record.scope) session.scope = record.scope;
   if (record.expires) session.expires = new Date(record.expires);
   if (record.accessToken) session.accessToken = record.accessToken;
@@ -131,5 +143,6 @@ function recordToSession(record: any): Session {
       },
     };
   }
+
   return session;
 }
