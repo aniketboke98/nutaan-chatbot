@@ -31,6 +31,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     default:
       console.log(`Unhandled compliance topic: ${topic}`);
+
       return new Response("Unhandled topic", { status: 404 });
   }
 
